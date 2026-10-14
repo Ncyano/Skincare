@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>肌肤抗衰自测问卷</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+  background: #FDF8F6;
+  color: #333;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+
+/* 首页 */
+.header { text-align: center; margin: 30px 0 24px; }
+.header h1 { font-size: 26px; font-weight: bold; color: #B76E79; margin-bottom: 8px; }
+.header p { font-size: 15px; color: #888; }
+.intro-card {
+  background: #fff; border-radius: 16px; padding: 22px 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 24px;
+}
+.intro-card .intro-title { font-size: 17px; font-weight: 600; color: #333; margin-bottom: 10px; }
+.intro-card .intro-tip { font-size: 13px; color: #999; }
+.start-btn {
+  display: block; width: 100%; text-align: center;
+  background: linear-gradient(135deg, #B76E79, #8E4A56);
+  color: #fff; font-size: 19px; font-weight: bold;
+  padding: 15px; border-radius: 50px;
+  box-shadow: 0 4px 20px rgba(183,110,121,0.35);
+  cursor: pointer; border: none;
+}
+.start-btn:active { opacity: 0.85; }
+.footer { margin-top: 30px; font-size: 11px; color: #ccc; text-align: center; }
+
+/* 答题页 */
+.progress-bar { height: 7px; background: #EFEFEF; border-radius: 4px; margin-bottom: 8px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #B76E79, #8E4A56); border-radius: 4px; transition: width 0.3s; }
+.progress-text { font-size: 12px; color: #999; text-align: right; margin-bottom: 18px; }
+.question-card {
+  background: #fff; border-radius: 16px; padding: 22px 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.q-title { font-size: 17px; font-weight: bold; color: #333; margin-bottom: 6px; }
+.q-subtitle { font-size: 13px; color: #888; margin-bottom: 18px; }
+.option-item {
+  display: flex; align-items: flex-start; padding: 13px 15px;
+  border-radius: 10px; border: 1.5px solid #E8E8E8;
+  margin-bottom: 11px; min-height: 52px; cursor: pointer;
+}
+.option-item.selected { border-color: #B76E79; background: #FDF0F2; }
+.option-dot {
+  width: 20px; height: 20px; border-radius: 50%; border: 2px solid #CCC;
+  margin-right: 11px; flex-shrink: 0; margin-top: 2px;
+}
+.option-item.selected .option-dot { border-color: #B76E79; background: #B76E79; }
+.option-text { font-size: 14px; color: #333; flex: 1; }
+.next-btn {
+  display: block; width: 100%; text-align: center;
+  background: linear-gradient(135deg, #B76E79, #8E4A56);
+  color: #fff; font-size: 17px; font-weight: bold;
+  padding: 15px; border-radius: 50px; margin-top: 22px;
+  cursor: pointer; border: none;
+}
+.next-btn.disabled { opacity: 0.4; pointer-events: none; }
+
+/* 结果弹窗 */
+.overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6); z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.result-modal {
+  background: #fff; border-radius: 20px; padding: 28px 22px;
+  max-height: 85vh; overflow-y: auto; width: 100%; max-width: 560px;
+}
+.result-modal h2 { font-size: 20px; font-weight: bold; color: #B76E79; text-align: center; margin-bottom: 16px; }
+.result-content { font-size: 14px; color: #444; line-height: 1.8; }
+.result-content .section { margin-bottom: 14px; }
+.result-content .section-title { font-weight: 600; color: #B76E79; margin-bottom: 6px; }
+.result-content .highlight { color: #B76E79; font-weight: 600; }
+.result-content .product { background: #FDF0F2; border-radius: 10px; padding: 14px; margin-top: 12px; }
+.result-content .product-title { font-weight: 600; color: #8E4A56; margin-bottom: 6px; }
+.close-btn {
+  display: block; width: 100%; text-align: center;
+  background: linear-gradient(135deg, #B76E79, #8E4A56);
+  color: #fff; font-size: 17px; font-weight: bold;
+  padding: 14px; border-radius: 50px; margin-top: 20px;
+  cursor: pointer; border: none;
+}
+.disclaimer { font-size: 11px; color: #bbb; text-align: center; margin-top: 14px; }
+
+/* 页面切换 */
+.page { display: none; }
+.page.active { display: block; }
+
+@media (max-width: 360px) {
+  .header h1 { font-size: 22px; }
+  .option-text { font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- 首页 -->
+  <div class="page active" id="page-home">
+    <div class="header">
+      <h1>肌肤抗衰自测问卷</h1>
+      <p>1分钟了解你的肌肤保养阶段</p>
+    </div>
+    <div class="intro-card">
+      <div class="intro-title">👉 5道题，帮你找到适合的抗衰方向</div>
+      <div class="intro-tip">无需登录 · 5题 · 答完即出专属建议</div>
+    </div>
+    <button class="start-btn" onclick="startQuiz()">开始自测</button>
+    <div class="footer">本自测仅作护肤参考，不能替代专业皮肤科诊断</div>
+  </div>
+
+  <!-- 答题页 -->
+  <div class="page" id="page-quiz">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">1 / 5</div>
+    <div class="question-card" id="questionCard"></div>
+    <button class="next-btn disabled" id="nextBtn" onclick="nextQuestion()">下一题</button>
+  </div>
+
+</div>
+
+<!-- 结果弹窗 -->
+<div class="overlay" id="resultOverlay" style="display:none;">
+  <div class="result-modal">
+    <h2>📋 你的专属肌肤抗衰建议</h2>
+    <div class="result-content" id="resultContent"></div>
+    <button class="close-btn" onclick="closeResult()">重新测试</button>
+    <div class="disclaimer">本自测仅作护肤参考，不能替代专业皮肤科诊断</div>
+  </div>
+</div>
+
+<script>
+// ========== 题目数据 ==========
+var questions = [
+  {
+    id: 1, type: 'single', title: '第1题 当前年龄段', subtitle: '请选择你所在的年龄段',
+    options: ['25-30', '31-35', '36-40', '41-45', '46-50', '51-60', '61-65', '66岁以上']
+  },
+  {
+    id: 2, type: 'single', title: '第2题 每天照镜子的时候，有没有肉眼可见面部状态不如从前？', subtitle: '请选择',
+    options: ['A. 是', 'B. 否']
+  },
+  {
+    id: 3, type: 'multi', title: '第3题 有哪些困扰让姐姐觉得皮肤状态在下滑？', subtitle: '符合几项选几项',
+    options: [
+      '苹果肌往下走、脸颊松弛',
+      '法令纹加深，不笑也能看出来',
+      '鱼尾纹、抬头纹越来越明显',
+      '熬夜导致皮肤整体状态下滑'
+    ]
+  },
+  {
+    id: 4, type: 'multi', title: '第4题 最希望萌萌的面霜帮助解决哪些问题？', subtitle: '符合几项选几项',
+    options: [
+      '面中有凹陷感，胶原感变少',
+      '脸色发黄暗沉，肤色不均匀',
+      '屏障受损，换季容易干燥',
+      '皮肤弹性下降，摸起来不再饱满紧实'
+    ]
+  },
+  {
+    id: 5, type: 'single', title: '第5题 是否有用过含【高浓度玻色因】的抗衰护肤品？', subtitle: '请选择',
+    options: ['A. 一直在用', 'B. 尝试用过', 'C. 从来没用过']
+  }
+];
+
+// ========== 年龄段分析 ==========
+function getAgeAnalysis(ageRange) {
+  var map = {
+    '25-30': { stage: '初抗老黄金期', problems: '胶原蛋白开始缓慢流失，熬夜后恢复变慢，细纹初现。', advice: '此时是抗衰介入的最佳窗口，重点在于预防光老化和维持胶原活力。' },
+    '31-35': { stage: '抗衰关键期', problems: '胶原流失加速，苹果肌开始轻微下移，肤色暗沉、弹性下降明显。', advice: '需要主动补充胶原刺激成分（如玻色因），配合防晒和抗氧化。' },
+    '36-40': { stage: '深层抗衰期', problems: '筋膜层松弛感出现，法令纹、木偶纹加深，皮肤干燥缺水。', advice: '需要高浓度抗衰成分+强效保湿屏障修护，面霜选择要兼顾充盈和紧致。' },
+    '41-45': { stage: '紧致修护期', problems: '面部轮廓模糊，松弛下垂成为主要困扰，皮肤代谢显著变慢。', advice: '高浓度玻色因类产品能帮助支撑真皮结构，配合按摩提升轮廓。' },
+    '46-50': { stage: '重塑支撑期', problems: '深层脂肪垫移位，面部凹陷感加重，皮肤变薄、敏感。', advice: '需要强修护+高滋养，面霜要足够丰润且能促进胶原再生。' },
+    '51-60': { stage: '养护修护期', problems: '皮肤整体变薄、干燥，弹性严重下降，皱纹加深变多。', advice: '温和抗衰+强屏障修护并重，避免刺激，选择高滋养面霜。' },
+    '61-65': { stage: '温和养护期', problems: '皮肤极度干燥脆弱，皱纹明显，恢复能力很弱。', advice: '以滋养修护为主，选择成分温和、高保湿抗衰产品。' },
+    '66岁以上': { stage: '极致养护期', problems: '皮肤屏障薄弱，深层皱纹遍布，需重点防干燥和刺激。', advice: '温和清洁+高保湿+轻度抗衰成分，面霜要足够润泽不刺激。' }
+  };
+  return map[ageRange] || map['31-35'];
+}
+
+// ========== 状态 ==========
+var current = 0;
+var selected = [];
+var answers = {};
+
+// ========== 页面切换 ==========
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startQuiz() {
+  current = 0; selected = []; answers = {};
+  renderQuestion();
+  showPage('page-quiz');
+}
+
+// ========== 渲染题目 ==========
+function renderQuestion() {
+  var q = questions[current];
+  document.getElementById('progressText').textContent = (current + 1) + ' / 5';
+  document.getElementById('progressFill').style.width = ((current + 1) / 5 * 100) + '%';
+
+  var html = '<div class="q-title">' + q.title + '</div><div class="q-subtitle">' + q.subtitle + '</div>';
+
+  if (q.type === 'multi') {
+    q.options.forEach(function(opt, idx) {
+      var selClass = selected.includes(idx) ? ' selected' : '';
+      html += '<div class="option-item' + selClass + '" onclick="toggleOption(' + idx + ')"><div class="option-dot"></div><div class="option-text">' + opt + '</div></div>';
+    });
+  } else {
+    q.options.forEach(function(opt, idx) {
+      var selClass = (selected[0] === idx) ? ' selected' : '';
+      html += '<div class="option-item' + selClass + '" onclick="chooseOption(' + idx + ')"><div class="option-dot"></div><div class="option-text">' + opt + '</div></div>';
+    });
+  }
+
+  document.getElementById('questionCard').innerHTML = html;
+  updateNextBtn();
+}
+
+function toggleOption(idx) {
+  if (selected.includes(idx)) {
+    selected = selected.filter(function(i) { return i !== idx; });
+  } else {
+    selected.push(idx);
+  }
+  renderQuestion();
+}
+
+function chooseOption(idx) {
+  selected = [idx];
+  renderQuestion();
+}
+
+function updateNextBtn() {
+  var btn = document.getElementById('nextBtn');
+  if (selected.length > 0) {
+    btn.classList.remove('disabled');
+    btn.textContent = (current < 4) ? '下一题' : '查看结果';
+  } else {
+    btn.classList.add('disabled');
+    btn.textContent = (current < 4) ? '下一题' : '查看结果';
+  }
+}
+
+// ========== 下一题 / 提交 ==========
+function nextQuestion() {
+  if (selected.length === 0) return;
+  answers[current] = selected.slice();
+  if (current < 4) {
+    current++;
+    selected = answers[current] ? answers[current].slice() : [];
+    renderQuestion();
+  } else {
+    calcAndShow();
+  }
+}
+
+// ========== 计算并展示结果 ==========
+function calcAndShow() {
+  var ageRange = questions[0].options[answers[0][0]];
+  var mirrorAns = answers[1][0] === 0 ? '是' : '否';
+  var troubles = (answers[2] || []).map(function(i) { return questions[2].options[i]; });
+  var needs = (answers[3] || []).map(function(i) { return questions[3].options[i]; });
+  var bosinAns = questions[4].options[answers[4][0]];
+
+  var ageInfo = getAgeAnalysis(ageRange);
+
+  // 构建结果文本（总字数控制在300字左右）
+  var resultHtml = '';
+
+  // 第一段：年龄段分析
+  resultHtml += '<div class="section"><div class="section-title">📌 你的护肤保养阶段</div>';
+  resultHtml += '你目前处于<span class="highlight">' + ageInfo.stage + '</span>（' + ageRange + '岁）。这个年龄段容易出现：' + ageInfo.problems + ' ' + ageInfo.advice + '</div>';
+
+  // 第二段：护肤建议 + 秋冬季 + 面霜
+  resultHtml += '<div class="section"><div class="section-title">💡 专属护肤建议</div>';
+  resultHtml += '秋冬季空气干燥、温差大，皮肤水分流失加快，是<span class="highlight">抗衰修护的黄金窗口</span>。';
+
+  if (troubles.length > 0) {
+    resultHtml += '你提到"' + troubles.slice(0, 2).join('、') + '"等困扰，';
+  }
+  if (needs.length > 0) {
+    resultHtml += '希望改善' + needs.slice(0, 2).join('、') + '，';
+  }
+
+  resultHtml += '建议选择含<span class="highlight">高浓度玻色因</span>的面霜——它能刺激胶原蛋白生成、提升皮肤弹性。';
+
+  if (bosinAns.indexOf('从来没用过') > -1) {
+    resultHtml += '你还没尝试过高浓度玻色因，秋冬季正是开始的好时机，能从根源改善松弛和凹陷感。';
+  } else {
+    resultHtml += '你已有使用经验，坚持高浓度玻色因面霜，秋冬叠加使用效果更显著。';
+  }
+
+  resultHtml += '配合充足睡眠和防晒，肌肤状态会稳步回升。';
+
+  // 产品融入
+  resultHtml += '<div class="product"><div class="product-title">🌟 萌萌面霜 · 秋冬季抗衰推荐</div>';
+  resultHtml += '高浓度玻色因配方，深层充盈胶原、淡化纹路、修护屏障。秋冬每天早晚使用，让肌肤在干燥季节也能保持饱满紧实，告别暗沉松弛。</div>';
+
+  document.getElementById('resultContent').innerHTML = resultHtml;
+  document.getElementById('resultOverlay').style.display = 'flex';
+}
+
+function closeResult() {
+  document.getElementById('resultOverlay').style.display = 'none';
+  current = 0; selected = []; answers = {};
+  showPage('page-home');
+}
+</script>
+</body>
+</html>
