@@ -87,7 +87,8 @@ body {
 .result-modal h2 { font-size: 20px; font-weight: bold; color: #B76E79; text-align: center; margin-bottom: 16px; }
 .result-content { font-size: 14px; color: #444; line-height: 1.8; }
 .result-content .section { margin-bottom: 14px; }
-.result-content .section-title { font-weight: 600; color: #B76E79; margin-bottom: 6px; }
+.result-content .stage-title { font-size: 18px; font-weight: 700; color: #B76E79; margin-bottom: 10px; text-align: center; padding: 10px 0; border-bottom: 2px solid #FDF0F2; }
+.result-content .section-title { font-weight: 600; color: #B76E79; margin-bottom: 6px; margin-top: 12px; }
 .result-content .highlight { color: #B76E79; font-weight: 600; }
 .result-content .product { background: #FDF0F2; border-radius: 10px; padding: 14px; margin-top: 12px; }
 .result-content .product-title { font-weight: 600; color: #8E4A56; margin-bottom: 6px; }
@@ -160,7 +161,7 @@ var questions = [
     options: ['A. 是', 'B. 否']
   },
   {
-    id: 3, type: 'multi', title: '第3题 有哪些困扰让姐姐觉得皮肤状态在下滑？', subtitle: '符合几项选几项',
+    id: 3, type: 'multi', title: '第3题 有哪些困扰让姐姐觉得皮肤状态在下滑？<span style="color:#B76E79;font-weight:700;">（多选，符合几项选几项）</span>', subtitle: ' ',
     options: [
       '苹果肌往下走、脸颊松弛',
       '法令纹加深，不笑也能看出来',
@@ -169,7 +170,7 @@ var questions = [
     ]
   },
   {
-    id: 4, type: 'multi', title: '第4题 最希望萌萌的面霜帮助解决哪些问题？', subtitle: '符合几项选几项',
+    id: 4, type: 'multi', title: '第4题 最希望萌萌的面霜帮助解决哪些问题？<span style="color:#B76E79;font-weight:700;">（多选，符合几项选几项）</span>', subtitle: ' ',
     options: [
       '面中有凹陷感，胶原感变少',
       '脸色发黄暗沉，肤色不均匀',
@@ -288,12 +289,16 @@ function calcAndShow() {
 
   var ageInfo = getAgeAnalysis(ageRange);
 
-  // 构建结果文本（总字数控制在300字左右）
+  // 构建结果文本
   var resultHtml = '';
 
+  // 保养阶段作为标题，重点显示
+  resultHtml += '<div class="stage-title">' + ageInfo.stage + '（' + ageRange + '岁）</div>';
+
   // 第一段：年龄段分析
-  resultHtml += '<div class="section"><div class="section-title">📌 你的护肤保养阶段</div>';
-  resultHtml += '你目前处于<span class="highlight">' + ageInfo.stage + '</span>（' + ageRange + '岁）。这个年龄段容易出现：' + ageInfo.problems + ' ' + ageInfo.advice + '</div>';
+  resultHtml += '<div class="section">';
+  resultHtml += '这个年龄段容易出现：' + ageInfo.problems + ' ' + ageInfo.advice;
+  resultHtml += '</div>';
 
   // 第二段：护肤建议 + 秋冬季 + 面霜
   resultHtml += '<div class="section"><div class="section-title">💡 专属护肤建议</div>';
